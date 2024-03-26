@@ -1,0 +1,139 @@
+#include <stdio.h>
+
+// Structure to represent a process
+struct Process {
+    int id; // Process ID
+    int burst_time; // Burst time
+    int arrival_time; // Arrival time
+    int waiting_time; // Waiting time
+    int turnaround_time; // Turnaround time
+    int remaining_time; // Remaining burst time for preemptive SJF
+};
+
+// Function to calculate waiting time and turnaround time for SJF (Non-Preemptive)
+void sjf_non_preemptive(struct Process proc[], int n) {
+    int total_time = 0;
+    float avg_waiting_time = 0, avg_turnaround_time = 0;
+    int i, j;
+
+    // Sort processes based on arrival time
+    for (i = 0; i < n - 1; i++) {
+        for (j = i + 1; j < n; j++) {
+            if (proc[i].arrival_time > proc[j].arrival_time) {
+                struct Process temp = proc[i];
+                proc[i] = proc[j];
+                proc[j] = temp;
+            }
+        }
+    }
+
+    // Calculate waiting time and turnaround time
+    for (i = 0; i < n; i++) {
+        proc[i].waiting_time = total_time - proc[i].arrival_time;
+        total_time += proc[i].burst_time;
+        proc[i].turnaround_time = proc[i].waiting_time + proc[i].burst_time;
+        avg_waiting_time += proc[i].waiting_time;
+        avg_turnaround_time += proc[i].turnaround_time;
+    }
+
+    avg_waiting_time /= n;
+    avg_turnaround_time /= n;
+
+    // Display results
+    printf("Process\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < n; i++) {
+        printf("%d\t%d\t\t%d\n", proc[i].id, proc[i].waiting_time, proc[i].turnaround_time);
+    }
+    printf("Average Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+}
+
+// Function to calculate waiting time and turnaround time for SJF (Preemptive)
+void sjf_preemptive(struct Process proc[], int n) {
+    int total_time = 0;
+    float avg_waiting_time = 0, avg_turnaround_time = 0;
+    int i, j, smallest;
+
+    // Initialize remaining time for each process
+    for (i = 0; i < n; i++) {
+        proc[i].remaining_time = proc[i].burst_time;
+    }
+
+    while (1) {
+        int done = 1; // Flag to check if all processes are done
+
+        for (i = 0; i < n; i++) {
+            if (proc[i].remaining_time > 0 && proc[i].arrival_time <= total_time) {
+                smallest = i;
+                done = 0; // At least one process is not done
+
+                for (j = 0; j < n; j++) {
+                    if (proc[j].remaining_time < proc[smallest].remaining_time && proc[j].arrival_time <= total_time) {
+                        smallest = j;
+                    }
+                }
+
+                // Update waiting time and remaining time
+                proc[smallest].waiting_time = total_time - proc[smallest].arrival_time;
+                total_time += proc[smallest].remaining_time;
+                proc[smallest].remaining_time = 0;
+
+                // Calculate turnaround time
+                proc[smallest].turnaround_time = proc[smallest].waiting_time + proc[smallest].burst_time;
+                avg_waiting_time += proc[smallest].waiting_time;
+                avg_turnaround_time += proc[smallest].turnaround_time;
+            }
+        }
+
+        if (done == 1) // All processes are done
+            break;
+    }
+
+    avg_waiting_time /= n;
+    avg_turnaround_time /= n;
+
+    // Display results
+    printf("Process\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < n; i++) {
+        printf("%d\t%d\t\t%d\n", proc[i].id, proc[i].waiting_time, proc[i].turnaround_time);
+    }
+    printf("Average Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+}
+
+int main() {
+    int n, i, choice;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process proc[n];
+
+    // Input process details
+    for (i = 0; i < n; i++) {
+        printf("Enter details for Process %d:\n", i + 1);
+        proc[i].id = i + 1;
+        printf("Burst Time: ");
+        scanf("%d", &proc[i].burst_time);
+        printf("Arrival Time: ");
+        scanf("%d", &proc[i].arrival_time);
+    }
+
+    printf("\nSelect Scheduling Algorithm:\n");
+    printf("1. SJF (Non-Preemptive)\n");
+    printf("2. SJF (Preemptive)\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1:
+            sjf_non_preemptive(proc, n);
+            break;
+        case 2:
+            sjf_preemptive(proc, n);
+            break;
+        default:
+            printf("Invalid choice\n");
+    }
+
+    return 0;
+}
