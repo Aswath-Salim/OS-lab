@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+typedef struct {
+    int value;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+} semaphore_t;
+
+void semaphore_init(semaphore_t *sem, int value) {
+    sem->value = value;
+    pthread_mutex_init(&sem->mutex, NULL);
+    pthread_cond_init(&sem->cond, NULL);
+}
+
+void semaphore_wait(semaphore_t *sem) {
+    pthread_mutex_lock(&sem->mutex);
+    while (sem->value <= 0) {
+        pthread_cond_wait(&sem->cond, &sem->mutex);
+    }
+    sem->value--;
+    pthread_mutex_unlock(&sem->mutex);
+}
+
+void semaphore_post(semaphore_t *sem) {
+    pthread_mutex_lock(&sem->mutex);
+    sem->value++;
+    pthread_cond_signal(&sem->cond);
+    pthread_mutex_unlock(&sem->mutex);
+}
+
+void semaphore_destroy(semaphore_t *sem) {
+    pthread_mutex_destroy(&sem->mutex);
+    pthread_cond_destroy(&sem->cond);
+}
+
+// Example usage
+semaphore_t my_semaphore;
+
+void *thread_function(void *arg) {
+    int id = *(int *)arg;
+    printf("Thread %d waiting...\n", id);
+    semaphore_wait(&my_semaphore);
+    printf("Thread %d acquired the semaphore\n", id);
+    // Do some work
+    printf("Thread %d releasing the semaphore\n", id);
+    semaphore_post(&my_semaphore);
+    return NULL;
+}
+
+int main() {
+    int NUM_THREADS = 5;
+    pthread_t threads[NUM_THREADS];
+    int thread_ids[NUM_THREADS];
+
+    semaphore_init(&my_semaphore, 2); // Initialize semaphore with value 2
+
+    // Create threads
+    for (int i = 0; i < NUM_THREADS; i++) {
+        thread_ids[i] = i;
+        pthread_create(&threads[i], NULL, thread_function, &thread_ids[i]);
+    }
+
+    // Join threads
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    semaphore_destroy(&my_semaphore); // Cleanup semaphore
+    return 0;
+}
