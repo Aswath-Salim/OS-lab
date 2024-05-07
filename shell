@@ -1,0 +1,161 @@
+#!/bin/bash
+
+echo "Enter first number:"
+read num1
+
+echo "Enter second number:"
+read num2
+
+echo "Choose operation:"
+echo "1. Addition"
+echo "2. Subtraction"
+echo "3. Multiplication"
+echo "4. Division"
+read choice
+
+case $choice in
+    1)
+        result=$(echo "$num1 + $num2" | bc)
+        echo "Result: $result"
+        ;;
+    2)
+        result=$(echo "$num1 - $num2" | bc)
+        echo "Result: $result"
+        ;;
+    3)
+        result=$(echo "$num1 * $num2" | bc)
+        echo "Result: $result"
+        ;;
+    4)
+        if [ $num2 -eq 0 ]; then
+            echo "Cannot divide by zero!"
+        else
+            result=$(echo "scale=2; $num1 / $num2" | bc)
+            echo "Result: $result"
+        fi
+        ;;
+    *)
+        echo "Invalid choice"
+        ;;
+esac
+
+#!/bin/bash
+
+echo "Enter first number:"
+read num1
+
+echo "Enter second number:"
+read num2
+
+echo "Enter third number:"
+read num3
+
+if [ $num1 -gt $num2 ] && [ $num1 -gt $num3 ]; then
+    echo "Greatest number: $num1"
+elif [ $num2 -gt $num1 ] && [ $num2 -gt $num3 ]; then
+    echo "Greatest number: $num2"
+else
+    echo "Greatest number: $num3"
+fi
+
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+if [ $((num % 2)) -eq 0 ]; then
+    echo "$num is even."
+else
+    echo "$num is odd."
+fi
+
+
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+factorial=1
+
+if [ $num -lt 0 ]; then
+    echo "Factorial is not defined for negative numbers."
+elif [ $num -eq 0 ]; then
+    echo "Factorial of 0 is 1."
+else
+    for ((i=1; i<=$num; i++))
+    do
+        factorial=$((factorial * i))
+    done
+    echo "Factorial of $num is $factorial."
+fi
+
+
+#!/bin/bash
+
+echo "Enter the number of Fibonacci sequence terms to generate:"
+read n
+
+# Initialize variables
+a=0
+b=1
+count=2
+
+# Display the first two terms of the Fibonacci sequence
+echo "Fibonacci sequence up to $n terms:"
+echo -n "$a $b "
+
+# Calculate and display the Fibonacci sequence
+while [ $count -lt $n ]
+do
+    # Calculate the next term
+    next=$((a + b))
+    echo -n "$next "
+
+    # Shift variables for the next iteration
+    a=$b
+    b=$next
+    count=$((count + 1))
+done
+
+echo "" # New line after printing the sequence
+
+
+#!/bin/bash
+
+echo "Enter a number:"
+read number
+
+sum=0
+
+# Loop through each digit of the number
+while [ $number -gt 0 ]
+do
+    # Extract the last digit
+    digit=$((number % 10))
+
+    # Add the digit to the sum
+    sum=$((sum + digit))
+
+    # Remove the last digit from the number
+    number=$((number / 10))
+done
+
+echo "Sum of digits: $sum"
+
+
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+reverse=""
+
+# Loop through each digit of the number and append it in reverse order
+while [ $num -gt 0 ]
+do
+    digit=$((num % 10))  # Extract the last digit
+    reverse="${reverse}${digit}"  # Append the digit to the reversed number
+    num=$((num / 10))  # Remove the last digit
+done
+
+echo "Reverse of the number: $reverse"
