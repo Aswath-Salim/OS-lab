@@ -1,0 +1,203 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_REQUESTS 100
+
+// Function prototypes
+void fcfs(int head, int requests[], int n);
+void sstf(int head, int requests[], int n);
+void scan(int head, int requests[], int n);
+void cscan(int head, int requests[], int n);
+void look(int head, int requests[], int n);
+void clook(int head, int requests[], int n);
+
+int main() {
+    int head, n;
+    int requests[MAX_REQUESTS];
+
+    // Input head position and number of requests
+    printf("Enter the current head position: ");
+    scanf("%d", &head);
+
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    // Input disk requests
+    printf("Enter the disk requests:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    // Menu for selecting disk scheduling algorithm
+    int choice;
+    printf("\nDisk Scheduling Algorithms:\n");
+    printf("1. FCFS (First-Come, First-Served)\n");
+    printf("2. SSTF (Shortest Seek Time First)\n");
+    printf("3. SCAN\n");
+    printf("4. C-SCAN (Circular SCAN)\n");
+    printf("5. LOOK\n");
+    printf("6. C-LOOK (Circular LOOK)\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    // Perform disk scheduling based on user's choice
+    switch (choice) {
+        case 1:
+            fcfs(head, requests, n);
+            break;
+        case 2:
+            sstf(head, requests, n);
+            break;
+        case 3:
+            scan(head, requests, n);
+            break;
+        case 4:
+            cscan(head, requests, n);
+            break;
+        case 5:
+            look(head, requests, n);
+            break;
+        case 6:
+            clook(head, requests, n);
+            break;
+        default:
+            printf("Invalid choice. Please try again.\n");
+    }
+
+    return 0;
+}
+
+// First-Come, First-Served (FCFS) disk scheduling algorithm
+void fcfs(int head, int requests[], int n) {
+    int total_seek_time = 0;
+
+    printf("FCFS Disk Scheduling:\n");
+    printf("Head Movement Order: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", requests[i]);
+        total_seek_time += abs(requests[i] - head);
+        head = requests[i];
+    }
+    printf("\nTotal Seek Time: %d\n", total_seek_time);
+}
+
+// Shortest Seek Time First (SSTF) disk scheduling algorithm
+void sstf(int head, int requests[], int n) {
+    int total_seek_time = 0;
+    int visited[MAX_REQUESTS] = {0};
+
+    printf("SSTF Disk Scheduling:\n");
+    printf("Head Movement Order: ");
+    for (int i = 0; i < n; i++) {
+        int min_seek = __INT_MAX__;
+        int min_index = -1;
+        for (int j = 0; j < n; j++) {
+            if (!visited[j] && abs(requests[j] - head) < min_seek) {
+                min_seek = abs(requests[j] - head);
+                min_index = j;
+            }
+        }
+        printf("%d ", requests[min_index]);
+        total_seek_time += min_seek;
+        head = requests[min_index];
+        visited[min_index] = 1;
+    }
+    printf("\nTotal Seek Time: %d\n", total_seek_time);
+}
+
+// SCAN disk scheduling algorithm
+void scan(int head, int requests[], int n) {
+    int total_seek_time = 0;
+    int direction = 1; // 1 for moving towards higher cylinder numbers, -1 for moving towards lower cylinder numbers
+
+    printf("SCAN Disk Scheduling:\n");
+    printf("Head Movement Order: ");
+    while (1) {
+        int found = 0;
+        for (int i = 0; i < n; i++) {
+            if (requests[i] == head) {
+                printf("%d ", head);
+                total_seek_time += abs(requests[i] - head);
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            if (direction == 1)
+                head++;
+            else
+                head--;
+        } else {
+            if (direction == 1)
+                head = 0;
+            else
+                head = 199;
+            direction *= -1;
+        }
+        if (total_seek_time >= 199)
+            break;
+    }
+    printf("\nTotal Seek Time: %d\n", total_seek_time);
+}
+
+// C-SCAN (Circular SCAN) disk scheduling algorithm
+void cscan(int head, int requests[], int n) {
+    int total_seek_time = 0;
+
+    printf("C-SCAN Disk Scheduling:\n");
+    printf("Head Movement Order: ");
+    // Move towards higher cylinder numbers
+    for (int i = head; i < 200; i++) {
+        for (int j = 0; j < n; j++) {
+            if (requests[j] == i) {
+                printf("%d ", i);
+                total_seek_time += abs(requests[j] - head);
+                head = requests[j];
+                break;
+            }
+        }
+    }
+    // Move towards lower cylinder numbers
+    for (int i = 0; i < head; i++) {
+        for (int j = 0; j < n; j++) {
+            if (requests[j] == i) {
+                printf("%d ", i);
+                total_seek_time += abs(requests[j] - head);
+                head = requests[j];
+                break;
+            }
+        }
+    }
+    printf("\nTotal Seek Time: %d\n", total_seek_time);
+}
+
+// LOOK disk scheduling algorithm
+void look(int head, int requests[], int n) {
+    int total_seek_time = 0;
+    int direction = 1; // 1 for moving towards higher cylinder numbers, -1 for moving towards lower cylinder numbers
+
+    printf("LOOK Disk Scheduling:\n");
+    printf("Head Movement Order: ");
+    while (1) {
+        int found = 0;
+        for (int i = 0; i < n; i++) {
+            if (requests[i] == head) {
+                printf("%d ", head);
+                total_seek_time += abs(requests[i] - head);
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            if (direction == 1)
+                head++;
+            else
+                head--;
+        } else {
+            if (direction == 1)
+                head = 0;
+            else
+                head = 199;
+            direction *= -1;
+        }
+        if (total_seek_time >= 
