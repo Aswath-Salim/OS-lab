@@ -1,0 +1,206 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_PAGES 100
+#define TRUE 1
+#define FALSE 0
+
+int pages[MAX_PAGES];
+int num_pages;
+int page_faults = 0;
+
+void FIFO(int frames) {
+    int frame[frames];
+    int i, j, k;
+    int flag;
+    
+    for (i = 0; i < frames; i++)
+        frame[i] = -1;
+        
+    j = 0;
+    printf("\nPage\tFrames\t\tPage Fault\n");
+    for (i = 0; i < num_pages; i++) {
+        printf("%d\t", pages[i]);
+        flag = FALSE;
+        for (k = 0; k < frames; k++) {
+            if (frame[k] == pages[i]) {
+                flag = TRUE;
+                break;
+            }
+        }
+        if (flag == FALSE) {
+            frame[j] = pages[i];
+            j = (j + 1) % frames;
+            page_faults++;
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\t\tPage Fault %d\n", page_faults);
+        } else {
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\n");
+        }
+    }
+}
+
+void LRU(int frames) {
+    int frame[frames];
+    int i, j, k, l, flag;
+    int counter[MAX_PAGES];
+    
+    for (i = 0; i < frames; i++)
+        frame[i] = -1;
+        
+    j = 0;
+    printf("\nPage\tFrames\t\tPage Fault\n");
+    for (i = 0; i < num_pages; i++) {
+        printf("%d\t", pages[i]);
+        flag = FALSE;
+        for (k = 0; k < frames; k++) {
+            if (frame[k] == pages[i]) {
+                flag = TRUE;
+                counter[k] = i;
+                break;
+            }
+        }
+        if (flag == FALSE) {
+            int min = 0;
+            for (l = 1; l < frames; l++) {
+                if (counter[min] > counter[l])
+                    min = l;
+            }
+            frame[min] = pages[i];
+            counter[min] = i;
+            page_faults++;
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\t\tPage Fault %d\n", page_faults);
+        } else {
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\n");
+        }
+    }
+}
+
+void Optimal(int frames) {
+    int frame[frames];
+    int i, j, k, l, flag;
+    int temp[MAX_PAGES];
+    
+    for (i = 0; i < frames; i++)
+        frame[i] = -1;
+        
+    j = 0;
+    printf("\nPage\tFrames\t\tPage Fault\n");
+    for (i = 0; i < num_pages; i++) {
+        printf("%d\t", pages[i]);
+        flag = FALSE;
+        for (k = 0; k < frames; k++) {
+            if (frame[k] == pages[i]) {
+                flag = TRUE;
+                break;
+            }
+        }
+        if (flag == FALSE) {
+            int pos = 0, max = 0;
+            for (l = 0; l < frames; l++) {
+                int dist = 0;
+                for (int m = i + 1; m < num_pages; m++) {
+                    if (frame[l] != pages[m]) {
+                        dist++;
+                    } else {
+                        break;
+                    }
+                }
+                temp[l] = dist;
+                if (dist > max) {
+                    max = dist;
+                    pos = l;
+                }
+            }
+            frame[pos] = pages[i];
+            page_faults++;
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\t\tPage Fault %d\n", page_faults);
+        } else {
+            for (k = 0; k < frames; k++) {
+                if (frame[k] != -1)
+                    printf("%d ", frame[k]);
+                else
+                    printf("- ");
+            }
+            printf("\n");
+        }
+    }
+}
+
+int main() {
+    int choice, frames;
+    
+    printf("Enter the number of pages: ");
+    scanf("%d", &num_pages);
+    
+    printf("Enter the page reference string: ");
+    for (int i = 0; i < num_pages; i++)
+        scanf("%d", &pages[i]);
+        
+    printf("\nEnter the number of frames: ");
+    scanf("%d", &frames);
+    
+    do {
+        printf("\nPage Replacement Algorithms:\n");
+        printf("1. FIFO (First In First Out)\n");
+        printf("2. LRU (Least Recently Used)\n");
+        printf("3. Optimal\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        
+        switch(choice) {
+            case 1:
+                page_faults = 0;
+                FIFO(frames);
+                printf("\nTotal page faults: %d\n", page_faults);
+                break;
+            case 2:
+                page_faults = 0;
+                LRU(frames);
+                printf("\nTotal page faults: %d\n", page_faults);
+                break;
+            case 3:
+                page_faults = 0;
+                Optimal(frames);
+                printf("\nTotal page faults: %d\n", page_faults);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    } while(choice != 4);
+    
+    return 0;
+}
