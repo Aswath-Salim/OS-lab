@@ -1,0 +1,238 @@
+#include<stdio.h>
+#include<string.h>
+#include<conio.h>
+
+void fcfs();
+void sjf();
+void priorityScheduling();
+void roundRobin();
+
+int main() {
+    int choice;
+    
+    printf("Select program to run:\n");
+    printf("1. Process Scheduling\n");
+    printf("2. Process Execution\n");
+    printf("3. Priority Scheduling\n");
+    printf("4. Round Robin\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    switch(choice) {
+        case 1:
+            fcfs();
+            break;
+        case 2:
+            sjf();
+            break;
+        case 3:
+            priorityScheduling();
+            break;
+        case 4:
+            roundRobin();
+            break;
+        default:
+            printf("Invalid choice!\n");
+    }
+
+    return 0;
+}
+
+void fcfs() {
+    int pn[10], t;
+    int arr[10], bur[10], star[10], finish[10], tat[10], wt[10], i, j, n, temp;
+    int totwt = 0, tottat = 0;
+
+    printf("Enter the number of processes:");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("Enter  P Arrival Time & Burst Time:");
+        pn[i]=i+1;
+        scanf(" %d %d",  &arr[i], &bur[i]);
+    }
+
+    for(i = 0; i < n; i++) {
+        for(j = 0; j < n; j++) {
+            if(arr[i] < arr[j]) {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                temp = bur[i];
+                bur[i] = bur[j];
+                bur[j] = temp;
+                t= pn[i];
+                pn[i]= pn[j];
+                pn[j]= t;
+            }
+        }
+    }
+
+    for(i = 0; i < n; i++) {
+        if(i == 0)
+            star[i] = arr[i];
+        else
+            star[i] = finish[i - 1];
+        wt[i] = star[i] - arr[i];
+        finish[i] = star[i] + bur[i];
+        tat[i] = finish[i] - arr[i];
+    }
+
+    printf("\nPName Arrtime Burtime WaitTime Start TAT Finish");
+    for(i = 0; i < n; i++) {
+        printf("\n%c\t%3d\t%3d\t%3d\t%3d\t%6d\t%6d", pn[i], arr[i], bur[i], wt[i], star[i], tat[i], finish[i]);
+        totwt += wt[i];
+        tottat += tat[i];
+    }
+
+    printf("\nAverage Waiting time: %f", (float)totwt / n);
+    printf("\nAverage Turn Around Time: %f", (float)tottat / n);
+}
+
+
+void sjf() {
+    int et[20], at[10], n, i, j, temp, st[10], ft[10], wt[10], ta[10];
+    float awt, ata,totwt,totta;
+    int pn[10], t;
+
+    printf("Enter the number of processes:");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+                pn[i]=i+1;
+        printf("Enter arrival time & execution time:");
+        fflush(stdin);
+        scanf("%d %d", &at[i], &et[i]);
+    }
+
+    for(i = 0; i < n; i++)
+        for(j = 0; j < n; j++) {
+            if(et[i] < et[j]) {
+                temp = at[i];
+                at[i] = at[j];
+                at[j] = temp;
+                temp = et[i];
+                et[i] = et[j];
+                et[j] = temp;
+                t= pn[i];
+                pn[i]= pn[j];
+                pn[j]= t;
+            }
+        }
+    for(i = 0; i < n; i++) {
+        if(i == 0)
+            st[i] = at[i];
+        else
+            st[i] = ft[i - 1];
+        wt[i] = st[i] - at[i];
+        ft[i] = st[i] + et[i];
+        ta[i] = ft[i] - at[i];
+    }
+
+    awt = (float)totwt / n;
+    ata = (float)totta / n;
+
+    printf("\nPname\tarrivaltime\texecutiontime\twaitingtime\ttatime");
+    for(i = 0; i < n; i++)
+        printf("\n%d\t%5d\t\t%5d\t\t%5d\t\t%5d", pn[i], at[i], et[i], wt[i], ta[i]);
+    printf("\nAverage waiting time is: %f", awt);
+    printf("\nAverage turnaround time is: %f", ata);
+}
+
+void priorityScheduling() {
+    int et[20], at[10], n, i, j, temp, p[10], st[10], ft[10], wt[10], ta[10];
+    float awt, ata,totwt,totta;
+    int pn[10], t;
+
+    printf("Enter the number of processes:");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("Enter arrival time, execution time & priority:");
+        fflush(stdin);
+        pn[i]=i+1;
+        scanf("%d %d %d", &at[i], &et[i], &p[i]);
+    }
+
+    for(i = 0; i < n; i++)
+        for(j = 0; j < n; j++) {
+            if(p[i] < p[j]) {
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+                temp = at[i];
+                at[i] = at[j];
+                at[j] = temp;
+                temp = et[i];
+                et[i] = et[j];
+                et[j] = temp;
+                t= pn[i];
+                pn[i]= pn[j];
+                pn[j]= t;
+            }
+        }
+
+    for(i = 0; i < n; i++) {
+        if(i == 0) {
+            st[i] = at[i];
+            wt[i] = st[i] - at[i];
+            ft[i] = st[i] + et[i];
+            ta[i] = ft[i] - at[i];
+        } else {
+            st[i] = ft[i - 1];
+            wt[i] = st[i] - at[i];
+            ft[i] = st[i] + et[i];
+            ta[i] = ft[i] - at[i];
+        }
+        totwt += wt[i];
+        totta += ta[i];
+    }
+
+    awt = (float)totwt / n;
+    ata = (float)totta / n;
+
+    printf("\nPname\tarrivaltime\texecutiontime\tpriority\twaitingtime\ttatime");
+    for(i = 0; i < n; i++)
+        printf("\n%d\t%5d\t\t%5d\t\t%5d\t\t%5d\t\t%5d", pn[i], at[i], et[i], p[i], wt[i], ta[i]);
+    printf("\nAverage waiting time is: %f", awt);
+    printf("\nAverage turnaround time is: %f", ata);
+}
+
+void roundRobin() {
+    int et[30], ts, n, i, x = 0, tot = 0;
+    int pn[10];
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    printf("Enter the time quantum: ");
+    scanf("%d", &ts);
+
+    for(i = 0; i < n; i++) {
+        printf("Enter  estimated time: ");
+                pn[i]=i+1;
+        scanf(" %d", &et[i]);
+    }
+
+    printf("The processes are:\n");
+    for(i = 0; i < n; i++)
+        printf("process %d: %d\n", i + 1, pn[i]);
+
+    for(i = 0; i < n; i++)
+        tot += et[i];
+
+    while(x != tot) {
+        for(i = 0; i < n; i++) {
+            if(et[i] > ts) {
+                x += ts;
+                printf("\n%d -> %d", pn[i], ts);
+                et[i] -= ts;
+            } else if((et[i] <= ts) && et[i] != 0) {
+                x += et[i];
+                printf("\n%d -> %d", pn[i], et[i]);
+                et[i] = 0;
+            }
+        }
+    }
+
+    printf("\nTotal Estimated Time: %d", x);
+}
