@@ -7,6 +7,38 @@ struct Process {
     int burstTime;
 };
 
+// Function to display the Gantt chart
+void displayGanttChart(struct Process processes[], int n) {
+    // Calculate total execution time
+    int totalExecutionTime = 0;
+    for (int i = 0; i < n; ++i) {
+        totalExecutionTime += processes[i].burstTime;
+    }
+
+    // Display the Gantt chart
+    printf("\nGantt Chart:\n");
+    printf(" ");
+    for (int i = 0; i < totalExecutionTime; ++i) {
+        printf("--");
+    }
+    printf("\n|");
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < processes[i].burstTime - 1; ++j) {
+            printf(" ");
+        }
+        printf("P%d", processes[i].processID);
+        for (int j = 0; j < processes[i].burstTime - 1; ++j) {
+            printf(" ");
+        }
+        printf("|");
+    }
+    printf("\n ");
+    for (int i = 0; i < totalExecutionTime; ++i) {
+        printf("--");
+    }
+    printf("\n");
+}
+
 int main() {
     int n; // Number of processes
     printf("Enter the number of processes: ");
@@ -37,53 +69,16 @@ int main() {
         }
     }
 
+    // Display Gantt chart
+    displayGanttChart(processes, n);
+
     // Calculate completion time, turnaround time, and waiting time
     int completionTime = 0;
     float totalTurnaroundTime = 0;
     float totalWaitingTime = 0;
 
-    printf("\nGantt Chart:\n");
-    printf(" ");
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < processes[i].burstTime; ++j) {
-            printf("--");
-        }
-        printf(" ");
-    }
-    printf("\n|");
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < processes[i].burstTime - 1; ++j) {
-            printf(" ");
-        }
-        printf("P%d", processes[i].processID);
-        for (int j = 0; j < processes[i].burstTime - 1; ++j) {
-            printf(" ");
-        }
-        printf("|");
-    }
-    printf("\n ");
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < processes[i].burstTime; ++j) {
-            printf("--");
-        }
-        printf(" ");
-    }
-    printf("\n");
-
- for (int i = 0; i < n+1; ++i) {
-         printf("%d", completionTime);
-        for (int j = 0; j < processes[i].burstTime; ++j) {
-            printf("  ");
-        }
-        
-       
-        completionTime += processes[i].burstTime;
-    }
-    printf("\n");
-
     printf("\nProcess Execution Order:\n");
     printf("Process ID\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\n");
-
     for (int i = 0; i < n; ++i) {
         if (processes[i].arrivalTime > completionTime)
             completionTime = processes[i].arrivalTime;
