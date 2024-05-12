@@ -1,72 +1,75 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+int mutex = 1;
+int full = 0;
 
-typedef struct {
-    int value;
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-} semaphore_t;
+int empty = 10, x = 0;
 
-void semaphore_init(semaphore_t *sem, int value) {
-    sem->value = value;
-    pthread_mutex_init(&sem->mutex, NULL);
-    pthread_cond_init(&sem->cond, NULL);
+void producer()
+{
+    --mutex;
+
+    ++full;
+
+    --empty;
+    x++;
+    printf("\nProducer produces"
+           "item %d",
+           x);
+
+    ++mutex;
 }
 
-void semaphore_wait(semaphore_t *sem) {
-    pthread_mutex_lock(&sem->mutex);
-    while (sem->value <= 0) {
-        pthread_cond_wait(&sem->cond, &sem->mutex);
+void consumer()
+{
+    --mutex;
+    --full;
+    ++empty;
+    printf("\nConsumer consumes "
+           "item %d",
+           x);
+    x--;
+    ++mutex;
+}
+int main()
+{
+    int n, i;
+    printf("\n1. Press 1 for Producer"
+           "\n2. Press 2 for Consumer"
+           "\n3. Press 3 for Exit");
+
+#pragma omp critical
+
+    for (i = 1; i > 0; i++) {
+
+        printf("\nEnter your choice:");
+        scanf("%d", &n);
+        switch (n) {
+        case 1:
+
+            if ((mutex == 1)
+                && (empty != 0)) {
+                producer();
+            }
+
+            else {
+                printf("Buffer is full!");
+            }
+            break;
+
+        case 2:
+            if ((mutex == 1)
+                && (full != 0)) {
+                consumer();
+            }
+            else {
+                printf("Buffer is empty!");
+            }
+            break;
+
+        case 3:
+            exit(0);
+            break;
+        }
     }
-    sem->value--;
-    pthread_mutex_unlock(&sem->mutex);
-}
-
-void semaphore_post(semaphore_t *sem) {
-    pthread_mutex_lock(&sem->mutex);
-    sem->value++;
-    pthread_cond_signal(&sem->cond);
-    pthread_mutex_unlock(&sem->mutex);
-}
-
-void semaphore_destroy(semaphore_t *sem) {
-    pthread_mutex_destroy(&sem->mutex);
-    pthread_cond_destroy(&sem->cond);
-}
-
-// Example usage
-semaphore_t my_semaphore;
-
-void *thread_function(void *arg) {
-    int id = *(int *)arg;
-    printf("Thread %d waiting...\n", id);
-    semaphore_wait(&my_semaphore);
-    printf("Thread %d acquired the semaphore\n", id);
-    // Do some work
-    printf("Thread %d releasing the semaphore\n", id);
-    semaphore_post(&my_semaphore);
-    return NULL;
-}
-
-int main() {
-    int NUM_THREADS = 5;
-    pthread_t threads[NUM_THREADS];
-    int thread_ids[NUM_THREADS];
-
-    semaphore_init(&my_semaphore, 2); // Initialize semaphore with value 2
-
-    // Create threads
-    for (int i = 0; i < NUM_THREADS; i++) {
-        thread_ids[i] = i;
-        pthread_create(&threads[i], NULL, thread_function, &thread_ids[i]);
-    }
-
-    // Join threads
-    for (int i = 0; i < NUM_THREADS; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    semaphore_destroy(&my_semaphore); // Cleanup semaphore
-    return 0;
 }
