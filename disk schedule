@@ -5,7 +5,7 @@
 #define LOW 0
 
 int main(){
-  int queue[20],sum,x, q_size, head,dloc, i,j, seek=0, diff, max, temp, queue1[20], queue2[20], temp1=0, temp2=0;
+  int queue[20],sum,x, q_size, head,dloc, i,j, seek=0, diff, max, temp,q[20], queue1[20], queue2[20], temp1=0, temp2=0;
   float avg;
 
   printf("%s\t", "Input no of disk locations");
@@ -153,15 +153,20 @@ case 3:
       }
 }
 
-  queue[0] = head;
+
+  int c,d;
+  for (c = q_size+2, d = 1; c >= 0; c--, d++)
+        q[d] = queue[c];
+
+  q[0] = head;
 
   for(j=0; j<=q_size+1; j++){
-      diff=abs(queue[j+1] - queue[j]);
+      diff=abs(q[j+1] - q[j]);
         seek += diff;
-    printf("%d-->",queue[j]);
+    printf("%d-->",q[j]);
 
   }
-  printf("%d",queue[j]);
+  printf("%d",q[j]);
   printf("\nTotal seek time is %d\n", seek);
   break;
 }
