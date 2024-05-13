@@ -11,13 +11,11 @@ typedef struct {
 
 
 void displayGanttChart(Process processes[], int n) {
-    // Calculate total execution time
     int totalExecutionTime = 0;
     for (int i = 0; i < n; ++i) {
         totalExecutionTime += processes[i].burst_time;
     }
 
-    // Display the Gantt chart
     printf("\nGantt Chart:\n");
     printf(" ");
     for (int i = 0; i < totalExecutionTime; ++i) {
@@ -74,19 +72,16 @@ void fcfs(Process processes[], int n)
             completionTime = processes[i].arrival_time;
         completionTime += processes[i].burst_time;
 
-        // Calculate turnaround time and waiting time
         int turnaroundTime = completionTime - processes[i].arrival_time;
         int waitingTime = turnaroundTime - processes[i].burst_time;
 
         totalTurnaroundTime += turnaroundTime;
         totalWaitingTime += waitingTime;
 
-        // Display process details
         printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t\t%d\n", processes[i].id, processes[i].arrival_time, 
                processes[i].burst_time, completionTime, turnaroundTime, waitingTime);
     }
 
-    // Calculate average turnaround time and average waiting time
     float avgTurnaroundTime = totalTurnaroundTime / n;
     float avgWaitingTime = totalWaitingTime / n;
     printf("\nAverage Turnaround Time: %.2f\n", avgTurnaroundTime);
@@ -107,9 +102,9 @@ void sjf(Process processes[], int n) {
     int seq_index = 0;
 
     printf("\nGantt Chart:\n");
-
+int shortest_index = -1;
     while (completed_processes < n) {
-        int shortest_index = -1;
+        
         int shortest_burst = 999999; 
 
         for (int i = 0; i < n; ++i) {
@@ -137,10 +132,34 @@ void sjf(Process processes[], int n) {
     }
     printf("| %d\n", current_time);
     printf("\nProcess Sequence:\n");
-    for (int i = 0; i < seq_index; i++) {
+        
+         int totalExecutionTime = 0;
+    for (int i = 0; i < n; ++i) {
+        totalExecutionTime += processes[shortest_index].burst_time;
+    }
+
+    printf("\nGantt Chart:\n");
+    printf(" ");
+    for (int i = 0; i < totalExecutionTime; ++i) {
+        printf("--");
+    }
+    printf("\n|");
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < processes[shortest_index].burst_time - 1; ++j) {
+            printf(" ");
+        }
         printf("P%d ", process_sequence[i]);
+        for (int j = 0; j < processes[shortest_index].burst_time - 1; ++j) {
+            printf(" ");
+        }
+        printf("|");
+    }
+    printf("\n ");
+    for (int i = 0; i < totalExecutionTime; ++i) {
+        printf("--");
     }
     printf("\n");
+       
 }
 
 
