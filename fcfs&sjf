@@ -164,7 +164,7 @@ int main() {
         
    
         fcfs(processes, n);
-
+       displayGanttChart(processes,n);
         break;
         case 2:
        
@@ -180,7 +180,7 @@ int main() {
     printf("Average Turnaround Time: %.2f\n", total_turnaround_time / n);
 
     display_table(processes, n);
-        break;
+     break;
     }
     
     return 0;
