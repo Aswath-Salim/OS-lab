@@ -100,7 +100,7 @@ void sjf(Process processes[], int n) {
         printf("Enter the arrival time and burst time for process %d: ", i + 1);
         scanf("%d %d", &processes[i].arrival_time, &processes[i].burst_time);
         processes[i].completed = 0;
-        
+     }
     int current_time = 0;
     int completed_processes = 0;
     int process_sequence[n]; 
@@ -142,7 +142,7 @@ void sjf(Process processes[], int n) {
     }
     printf("\n");
 }
-}
+
 
 void display_table(Process processes[], int n) {
     printf("\nProcess\tBurst Time\tArrival Time\tWaiting Time\tTurnaround Time\n");
